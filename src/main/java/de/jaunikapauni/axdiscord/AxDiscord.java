@@ -19,11 +19,13 @@ public final class AxDiscord extends JavaPlugin {
         webhookUrl = getConfig().getString("discord.webhook");
         server = getConfig().getString("server");
         getServer().getPluginManager().registerEvents(new ChatListener(this), this);
+        this.send("Server", "Enabled!");
     }
 
     @Override
     public void onDisable() {
         // Plugin shutdown logic
+        this.send("Server", "Disabled!");
     }
 
     public void send(String username, String message){
