@@ -1,0 +1,11 @@
+name: AxDiscord
+description: $description
+prefix: AxDiscord
+version: '${version}'
+
+main: de.jaunikapauni.axdiscord.AxDiscord
+api-version: '26.1.2'
+load: STARTUP
+
+authors: [ JauniKapauni ]
+website: https://github.com/JauniKapauni
