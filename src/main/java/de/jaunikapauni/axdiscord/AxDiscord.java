@@ -20,6 +20,13 @@ public final class AxDiscord extends JavaPlugin {
         server = getConfig().getString("server");
         getServer().getPluginManager().registerEvents(new ChatListener(this), this);
         this.send("Server", "Enabled!");
+        getLogger().info("");
+        getLogger().info("----------------------------------------");
+        getLogger().info("Name: " + getName());
+        getLogger().info("Version: " + getDescription().getVersion());
+        getLogger().info(String.join("Authors: " + ", ", getDescription().getAuthors()));
+        getLogger().info("----------------------------------------");
+        getLogger().info("");
     }
 
     @Override
