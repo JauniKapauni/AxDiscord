@@ -36,7 +36,7 @@ public final class AxDiscord extends JavaPlugin {
     }
 
     public void send(String username, String message){
-        Bukkit.getScheduler().runTask(this, () -> {
+        Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
             try{
                 String format = server + " " + username + " " + message;
                 URL url = new URL(webhookUrl);
