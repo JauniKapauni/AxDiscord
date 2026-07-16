@@ -1,6 +1,7 @@
 package de.jaunikapauni.axdiscord.listener;
 
 import de.jaunikapauni.axdiscord.AxDiscord;
+import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.entity.Player;
@@ -14,9 +15,9 @@ public class ChatListener implements Listener {
         this.reference = reference;
     }
     @EventHandler
-    public void onChatMessage(PlayerChatEvent e){
+    public void onChatMessage(AsyncChatEvent e){
         Player p = e.getPlayer();
-        String msg = PlainTextComponentSerializer.plainText().serialize(Component.text(e.getMessage()));
+        String msg = PlainTextComponentSerializer.plainText().serialize(e.message());
         reference.send(p.getName(), msg);
     }
 }
