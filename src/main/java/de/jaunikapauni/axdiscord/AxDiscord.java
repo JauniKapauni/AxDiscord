@@ -49,7 +49,7 @@ public final class AxDiscord extends JavaPlugin {
                         "username": "Minecraft",
                         "content": "%s"
                 }
-                """.formatted(format);
+                """.formatted(escapeJson(format));
 
                 try(OutputStream os = conn.getOutputStream()){
                     os.write(json.getBytes());
@@ -59,5 +59,9 @@ public final class AxDiscord extends JavaPlugin {
                 e.printStackTrace();
             }
         });
+    }
+
+    public String escapeJson(String text){
+        return text.replace("\\", "\\\\").replace("\"", "\\\"");
     }
 }
