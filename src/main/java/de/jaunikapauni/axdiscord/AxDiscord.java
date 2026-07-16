@@ -37,7 +37,7 @@ public final class AxDiscord extends JavaPlugin {
     @Override
     public void onDisable() {
         // Plugin shutdown logic
-        this.send("Server", "Disabled!");
+        this.sendSync("Server", "Disabled!");
     }
 
     public void send(String username, String message){
@@ -72,5 +72,13 @@ public final class AxDiscord extends JavaPlugin {
 
     public String escapeJson(String text){
         return text.replace("\\", "\\\\").replace("\"", "\\\"");
+    }
+
+    public void sendSync(String username, String message){
+        try{
+            send(username, message);
+        } catch (Exception e){
+            getLogger().warning("Failed to send discord shutdown message");
+        }
     }
 }
