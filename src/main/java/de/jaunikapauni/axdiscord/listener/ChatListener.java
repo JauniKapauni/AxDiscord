@@ -18,6 +18,6 @@ public class ChatListener implements Listener {
     public void onChatMessage(AsyncChatEvent e){
         Player p = e.getPlayer();
         String msg = PlainTextComponentSerializer.plainText().serialize(e.message());
-        reference.send(p.getName(), msg);
+        reference.sendAsync(p.getName(), msg);
     }
 }

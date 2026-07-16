@@ -24,7 +24,7 @@ public final class AxDiscord extends JavaPlugin {
         }
         server = getConfig().getString("server");
         getServer().getPluginManager().registerEvents(new ChatListener(this), this);
-        this.send("Server", "Enabled!");
+        this.sendAsync("Server", "Enabled!");
         getLogger().info("");
         getLogger().info("----------------------------------------");
         getLogger().info("Name: " + getName());
@@ -40,33 +40,9 @@ public final class AxDiscord extends JavaPlugin {
         this.sendSync("Server", "Disabled!");
     }
 
-    public void send(String username, String message){
+    public void sendAsync(String username, String message){
         Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
-            try{
-                String format = server + " " + username + " " + message;
-                URL url = new URL(webhookUrl);
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setRequestMethod("POST");
-                conn.setDoOutput(true);
-                conn.setRequestProperty("Content-Type", "application/json");
-                String json = """
-                        {
-                        "username": "Minecraft",
-                        "content": "%s"
-                }
-                """.formatted(escapeJson(format));
-
-                try(OutputStream os = conn.getOutputStream()){
-                    os.write(json.getBytes());
-                }
-                try{
-                    conn.getResponseCode();
-                } finally {
-                    conn.disconnect();
-                }
-            } catch (Exception e){
-                e.printStackTrace();
-            }
+            send(username, message);
         });
     }
 
@@ -79,6 +55,34 @@ public final class AxDiscord extends JavaPlugin {
             send(username, message);
         } catch (Exception e){
             getLogger().warning("Failed to send discord shutdown message");
+        }
+    }
+
+    public void send(String username, String message){
+        try{
+            String format = server + " " + username + " " + message;
+            URL url = new URL(webhookUrl);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setDoOutput(true);
+            conn.setRequestProperty("Content-Type", "application/json");
+            String json = """
+                        {
+                        "username": "Minecraft",
+                        "content": "%s"
+                }
+                """.formatted(escapeJson(format));
+
+            try(OutputStream os = conn.getOutputStream()){
+                os.write(json.getBytes());
+            }
+            try{
+                conn.getResponseCode();
+            } finally {
+                conn.disconnect();
+            }
+        } catch (Exception e){
+            e.printStackTrace();
         }
     }
 }
