@@ -7,10 +7,13 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public final class AxDiscord extends JavaPlugin {
     String webhookUrl;
     String server;
+    Queue<String> queue = new ConcurrentLinkedQueue<>();
 
     @Override
     public void onEnable() {
@@ -24,6 +27,7 @@ public final class AxDiscord extends JavaPlugin {
         }
         server = getConfig().getString("server");
         getServer().getPluginManager().registerEvents(new ChatListener(this), this);
+        startWebhookWorker();
         this.sendAsync("Server", "Enabled!");
         getLogger().info("");
         getLogger().info("----------------------------------------");
@@ -41,9 +45,14 @@ public final class AxDiscord extends JavaPlugin {
     }
 
     public void sendAsync(String username, String message){
-        Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
-            send(username, message);
-        });
+        String format = server + " " + username + " " + message;
+        String json = """
+                {
+                "username": "Minecraft",
+                "content": "%s"
+                }
+                """.formatted(escapeJson(format));
+        queue.add(json);
     }
 
     public String escapeJson(String text){
@@ -51,28 +60,23 @@ public final class AxDiscord extends JavaPlugin {
     }
 
     public void sendSync(String username, String message){
-        try{
-            send(username, message);
-        } catch (Exception e){
-            getLogger().warning("Failed to send discord shutdown message");
-        }
+        String format = server + " " + username + " " + message;
+        String json = """
+                {
+                "username": "Minecraft",
+                "content": "%s"
+                }
+                """.formatted(escapeJson(format));
+        send(json);
     }
 
-    public void send(String username, String message){
+    public void send(String json){
         try{
-            String format = server + " " + username + " " + message;
             URL url = new URL(webhookUrl);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
             conn.setDoOutput(true);
             conn.setRequestProperty("Content-Type", "application/json");
-            String json = """
-                        {
-                        "username": "Minecraft",
-                        "content": "%s"
-                }
-                """.formatted(escapeJson(format));
-
             try(OutputStream os = conn.getOutputStream()){
                 os.write(json.getBytes());
             }
@@ -84,5 +88,14 @@ public final class AxDiscord extends JavaPlugin {
         } catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    void startWebhookWorker(){
+        Bukkit.getScheduler().runTaskTimerAsynchronously(this, () -> {
+            String json;
+            while ((json = queue.poll()) != null){
+                send(json);
+            }
+        }, 0L, 20L);
     }
 }
