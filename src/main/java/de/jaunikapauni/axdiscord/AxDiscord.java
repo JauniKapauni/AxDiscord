@@ -17,6 +17,11 @@ public final class AxDiscord extends JavaPlugin {
         // Plugin startup logic
         saveDefaultConfig();
         webhookUrl = getConfig().getString("discord.webhook");
+        if(webhookUrl == null || webhookUrl.isEmpty()){
+            getLogger().warning("Discord webhook is missing!");
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
         server = getConfig().getString("server");
         getServer().getPluginManager().registerEvents(new ChatListener(this), this);
         this.send("Server", "Enabled!");
