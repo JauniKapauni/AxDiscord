@@ -59,7 +59,11 @@ public final class AxDiscord extends JavaPlugin {
                 try(OutputStream os = conn.getOutputStream()){
                     os.write(json.getBytes());
                 }
-                conn.getResponseCode();
+                try{
+                    conn.getResponseCode();
+                } finally {
+                    conn.disconnect();
+                }
             } catch (Exception e){
                 e.printStackTrace();
             }
